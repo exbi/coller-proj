@@ -102,13 +102,13 @@ void loop()
     WiFi.printDiag(Serial);
 
     String data = "Latitude="
-          +                        (String) _lati
-          +  "&Longitude="  +(String) _longi;
+          +                     (String) _lati //(String) 40.7282  //
+          +  "&Longitude="  +   (String) _longi; //String) -74.0776 
 
      //change URL below if using your Sub-Domain
-     client.println("POST /index.php HTTP/1.1"); 
+     client.println("POST /main.php HTTP/1.1"); 
      //change URL below if using your Domain
-     client.print("Host: https://smartcollar.000webhostapp.com\n");                 
+     client.print("Host: smartcollar.000webhostapp.com\n");                 
      client.println("User-Agent: ESP8266/1.0");
      client.println("Connection: close"); 
      client.println("Content-Type: application/x-www-form-urlencoded");
