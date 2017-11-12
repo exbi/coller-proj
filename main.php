@@ -26,14 +26,17 @@ $WriteMyRequest = "<!DOCTYPE html>
     <style>
        #map {
         height: 400px;
-        width: 25%;
+        width: 50%;
        }
         body {
+        width: auto;
+        margin: 20px;
         font-family: 'Alef';font-size: 22px;
         }
         h2, h2+p {display: inline;}
     </style>
   </head>
+  <div class = \"content\">
   <body>
     <h2>Smart Collar </h2> <p>By D. Tsymbala, S. Budinoski, K. de Asis, A. Hedhli</p> <br/>".
      $TimeStamp."<br/>".
@@ -52,12 +55,39 @@ $WriteMyRequest = "<!DOCTYPE html>
           position: uluru,
           map: map
         });
+         var drawingManager = new google.maps.drawing.DrawingManager({
+          drawingMode: google.maps.drawing.OverlayType.MARKER,
+          drawingControl: true,
+          drawingControlOptions: {
+            position: google.maps.ControlPosition.TOP_CENTER,
+            drawingModes: ['circle', 'polygon']
+          },
+          markerOptions: {icon: 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png'},
+          circleOptions: {
+            fillColor: '#ffff00',
+            fillOpacity: .2,
+            strokeWeight: 1,
+            clickable: false,
+            editable: true,
+            zIndex: 1
+          }
+        });
+        drawingManager.setMap(map);
+        
+         google.maps.event.addListener(drawingManager, 'polygoncomplete', function(polygon) {
+        if(google.maps.geometry.poly.containsLocation(marker.getPosition(),polygon)){
+         alert(\"Done\");
+        }
+});
+  
+        
       }
     </script>
     <script async defer
-    src=\"https://maps.googleapis.com/maps/api/js?key=AIzaSyBdZlGc7e2SPKvzRuPaoASDAzYHofsdBRk&callback=initMap\">
+    src=\"https://maps.googleapis.com/maps/api/js?key=AIzaSyBdZlGc7e2SPKvzRuPaoASDAzYHofsdBRk&libraries=drawing&callback=initMap\">
     </script>
   </body>
+  </div>
 </html>" ;
 
 echo $WriteMyRequest;
