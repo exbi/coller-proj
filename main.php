@@ -3,22 +3,16 @@
 
     
 <?php 
-
 date_default_timezone_set("America/New_York");
 $TimeStamp = "The current time is " . date("h:i:sa");
 //file_put_contents('dataDisplayer.html', $TimeStamp, FILE_APPEND);
-
-
    if( isset($_POST["Latitude"]) ||  isset($_POST["Longitude"]) ) 
    {
    echo " The Humidity is: ". $_POST['Latitude']. "%<br />";
    echo " The Temperature is: ". $_POST['Longitude']. " Celcius<br />";
    }
-
 $var1 = isset($_POST['Latitude']) ? $_POST['Latitude'] : '';	  
 $var2 = isset($_POST['Longitude']) ? $_POST['Longitude'] : '';
-
-
 $WriteMyRequest = "<!DOCTYPE html>
 <html>
   <head>
@@ -35,6 +29,8 @@ $WriteMyRequest = "<!DOCTYPE html>
         }
         h2, h2+p {display: inline;}
     </style>
+    <script type=\"text/javascript\" src=\"https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js\"></script>
+    <script type=\"text/javascript\" src=\"http://jquery.offput.ca/js/jquery.timers.js\"></script>
   </head>
   <div class = \"content\">
   <body>
@@ -72,11 +68,13 @@ $WriteMyRequest = "<!DOCTYPE html>
             zIndex: 1
           }
         });
-        drawingManager.setMap(map);
-        
+         drawingManager.setMap(map);
+         var safeZone = new google.maps.Polygon();
+         
          google.maps.event.addListener(drawingManager, 'polygoncomplete', function(polygon) {
         if(google.maps.geometry.poly.containsLocation(marker.getPosition(),polygon)){
-         alert(\"Done\");
+         safeZone = polygon;
+         alert(\"Your pet zone has been created!\");
         }
 });
   
@@ -89,12 +87,8 @@ $WriteMyRequest = "<!DOCTYPE html>
   </body>
   </div>
 </html>" ;
-
 echo $WriteMyRequest;
-
 file_put_contents('index.html', $WriteMyRequest);
-
-
 ?>
 
 </html>
