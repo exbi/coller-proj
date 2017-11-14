@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-
+<head> <meta http-equiv="refresh" content="1" ></head>
     
 <?php 
 date_default_timezone_set("America/New_York");
@@ -31,6 +31,7 @@ $WriteMyRequest = "<!DOCTYPE html>
     </style>
     <script type=\"text/javascript\" src=\"https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js\"></script>
     <script type=\"text/javascript\" src=\"http://jquery.offput.ca/js/jquery.timers.js\"></script>
+     <meta http-equiv=\"refresh\" content=\"10\" >
   </head>
   <div class = \"content\">
   <body>
@@ -39,36 +40,42 @@ $WriteMyRequest = "<!DOCTYPE html>
      "<p> Latitude : "       . $var1 . " </p>".
      "<p> Longitude : " . $var2 . " </p> <br/>".
      "<button type=\"button\">Activate Dog Whistle</button>
+     <input type=\"button\" value=\"Clear Safe Zone\" id=\"DeletePolygons\" >
     <div id=\"map\"></div>
     <script>
+    
+      $(document).ready(function(){
+    $('#DeletePolygons').click(function(){
+       localStorage.clear();
+    });
+  });
+    
+    
+      var map;
       function initMap() {
         var uluru = {lat: " . $var1 . " , lng: " . $var2 . "};
-        var map = new google.maps.Map(document.getElementById('map'), {
-          zoom: 4,
-          center: uluru
+        map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 15,
+          center: uluru,
+          mapTypeId: google.maps.MapTypeId.ROADMAP,
+          mapTypeControl: false
         });
         var marker = new google.maps.Marker({
           position: uluru,
           map: map
         });
-         var drawingManager = new google.maps.drawing.DrawingManager({
-          drawingMode: google.maps.drawing.OverlayType.MARKER,
-          drawingControl: true,
-          drawingControlOptions: {
-            position: google.maps.ControlPosition.TOP_CENTER,
-            drawingModes: ['circle', 'polygon']
-          },
-          markerOptions: {icon: 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png'},
-          circleOptions: {
-            fillColor: '#ffff00',
-            fillOpacity: .2,
-            strokeWeight: 1,
-            clickable: false,
-            editable: true,
-            zIndex: 1
-          }
-        });
-         drawingManager.setMap(map);
+          map.data.setControls(['Polygon']);
+    map.data.setStyle({
+        editable: true,
+        draggable: true
+    });
+    
+    
+    bindDataLayerListeners(map.data);
+
+    //load saved data
+    loadPolygons(map);
+    
          var safeZone = new google.maps.Polygon();
          
          google.maps.event.addListener(drawingManager, 'polygoncomplete', function(polygon) {
@@ -76,10 +83,42 @@ $WriteMyRequest = "<!DOCTYPE html>
          safeZone = polygon;
          alert(\"Your pet zone has been created!\");
         }
-});
-  
         
+        
+        
+});
+            bindDataLayerListeners(map.data);
+
+    //load saved data
+            loadPolygons(map);
+
       }
+      
+      
+      function bindDataLayerListeners(dataLayer) {
+    dataLayer.addListener('addfeature', savePolygon);
+    dataLayer.addListener('removefeature', savePolygon);
+    dataLayer.addListener('setgeometry', savePolygon);
+}
+
+function loadPolygons(map) {
+    var data = JSON.parse(localStorage.getItem('geoData'));
+    map.data.forEach(function (f) {
+        map.data.remove(f);
+    });
+    map.data.addGeoJson(data)
+}
+
+
+
+function savePolygon() {
+    map.data.toGeoJson(function (json) {
+        localStorage.setItem('geoData', JSON.stringify(json));
+    });
+}
+
+
+      
     </script>
     <script async defer
     src=\"https://maps.googleapis.com/maps/api/js?key=AIzaSyBdZlGc7e2SPKvzRuPaoASDAzYHofsdBRk&libraries=drawing&callback=initMap\">
