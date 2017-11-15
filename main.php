@@ -4,6 +4,9 @@
     
 <?php 
 date_default_timezone_set("America/New_York");
+
+
+
 $TimeStamp = "The current time is " . date("h:i:sa");
 //file_put_contents('dataDisplayer.html', $TimeStamp, FILE_APPEND);
    if( isset($_POST["Latitude"]) ||  isset($_POST["Longitude"]) ) 
@@ -119,7 +122,17 @@ function loadPolygons(map) {
         google.maps.event.addListener(map, 'idle', function() {
     if(google.maps.geometry.poly.containsLocation(marker.getPosition(),safeZone)){
           alert(\"true\");
-     }else{ alert(\"false\"); }
+     }else{ alert(\"false\"); 
+         
+       //  $.ajax({ url: '/call.php',
+       //  type: 'post'
+       //     });
+       
+           $.ajax({ url: '/send.php',
+           type: 'post'
+              });
+         
+     }
         });
     
  });
