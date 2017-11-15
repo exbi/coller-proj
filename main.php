@@ -30,7 +30,12 @@ $WriteMyRequest = "<!DOCTYPE html>
         h2, h2+p {display: inline;}
     </style>
     <script type=\"text/javascript\" src=\"https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js\"></script>
+    <script type=\"text/javascript\" src=\"maps.google.polygon.containsLatLng.js\"></script>
+    <script type=\"text/javascript\" src=\"http://maps.google.com/maps/api/js?sensor=false\"></script>
     <script type=\"text/javascript\" src=\"http://jquery.offput.ca/js/jquery.timers.js\"></script>
+    <script type=\"text/javascript\" src=\"jquery-1.6.4-min.js\"></script>
+    <script type=\"text/javascript\" src=\"beautify.js\"></script>
+	<script type=\"text/javascript\" src=\"GeoJSON.js\"></script>
      <meta http-equiv=\"refresh\" content=\"10\" >
   </head>
   <div class = \"content\">
@@ -51,42 +56,27 @@ $WriteMyRequest = "<!DOCTYPE html>
   });
     
     
-      var map;
+      var map; var marker;
+      var safeZone = new google.maps.Polygon();
+      
       function initMap() {
-        var uluru = {lat: " . $var1 . " , lng: " . $var2 . "};
+        var uluru = {lat: " . 40.74 . " , lng: " . -74.10 . "};
         map = new google.maps.Map(document.getElementById('map'), {
           zoom: 15,
           center: uluru,
           mapTypeId: google.maps.MapTypeId.ROADMAP,
           mapTypeControl: false
         });
-        var marker = new google.maps.Marker({
+          marker = new google.maps.Marker({
           position: uluru,
           map: map
         });
           map.data.setControls(['Polygon']);
-    map.data.setStyle({
+        map.data.setStyle({
         editable: true,
         draggable: true
     });
-    
-    
-    bindDataLayerListeners(map.data);
 
-    //load saved data
-    loadPolygons(map);
-    
-         var safeZone = new google.maps.Polygon();
-         
-         google.maps.event.addListener(drawingManager, 'polygoncomplete', function(polygon) {
-        if(google.maps.geometry.poly.containsLocation(marker.getPosition(),polygon)){
-         safeZone = polygon;
-         alert(\"Your pet zone has been created!\");
-        }
-        
-        
-        
-});
             bindDataLayerListeners(map.data);
 
     //load saved data
@@ -106,7 +96,35 @@ function loadPolygons(map) {
     map.data.forEach(function (f) {
         map.data.remove(f);
     });
-    map.data.addGeoJson(data)
+    map.data.addGeoJson(data);
+    
+     data.features.forEach(function(feat){
+   var geom=feat.geometry; 
+   var props=feat.properties;
+   if (geom.type === 'Polygon'){
+      for (var i=0; i < geom.coordinates.length; i++){
+          var polygon = { 
+               'type':'Polygon', 
+               'coordinates':[geom.coordinates[i]]
+          };
+      }
+      
+  
+    }
+    
+    
+    var newPoly = new GeoJSON(polygon);
+    safeZone = newPoly;
+
+        google.maps.event.addListener(map, 'idle', function() {
+    if(google.maps.geometry.poly.containsLocation(marker.getPosition(),safeZone)){
+          alert(\"true\");
+     }else{ alert(\"false\"); }
+        });
+    
+ });
+        
+        
 }
 
 
